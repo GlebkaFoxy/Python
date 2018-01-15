@@ -1,35 +1,23 @@
-import requests
 import json
-import  time
-from WorkBotToGit.Slack.Channels.askChanels import readJson
-from WorkBotToGit.pathToFile import Echat, ChannelID, TelegMessage
-from WorkBotToGit.telegramm.Telegramm import sendMessage
-from tokens import tokenVRTech, tokenCinemaVR, TelegChannel
+import time
 
+from WorkBotToGit.Libraries.Slack import Channels
+from WorkBotToGit.Libraries.Slack.Users import Users
+from WorkBotToGit.pathToFile import Echat
+from WorkBotToGit.telegramm.Telegramm import sendMessage
+from tokens import tokenCinemaVR,tokenVRTech, TelegChannel
+from WorkBotToGit.pathToFile import ChanneliD
 lol ={}
 
 def readChatF(channel):
-    # Поля для запроса
-    fields = {'token': tokenCinemaVR, 'channel':channel, 'count':'3'}
-    # Делаем первичный запрос для последних 3 сообщений.
-
-    histori = requests.post('https://slack.com/api/channels.history', data=fields)
-    #print(histori.text)
-
     #Запихиваем в JSON
     with open(Echat, "w") as chat:
-        json.dump(histori.json(),chat,indent=2, ensure_ascii='utf-8')
+        json.dump(Channels.Histori(tokenCinemaVR,channel,3),chat,indent=2, ensure_ascii='utf-8')
 
 
     # Сохраняем IDchannel в файл, для дальнейшего исспользования.
-    with open("C:\\untitled\WorkBotToGit\Slack\JsonFiles\ChannelID.txt","w") as ChannelID:
+    with open(ChanneliD,"w") as ChannelID:
         ChannelID.write(channel)
-
-
-
-
-
-
 
 
 def histori(ChannelID,Echat,TelegMessage):
@@ -48,14 +36,10 @@ def histori(ChannelID,Echat,TelegMessage):
         #print(lol.get('ts'))
 
     # подготавливаем запрос на проверку новых сообщений
-    fields2 = {'token': tokenCinemaVR, 'channel': ID, 'oldest':lol.get('ts')}
-    # сам запрос
-    request = requests.post('https://slack.com/api/channels.history',data=fields2)
-    print(request.text)
+    hah = dict(Channels.Histori(tokenCinemaVR,ID,oldest=lol.get('ts')))
+    print(hah)
 
-    hah = request.json()
 
-    #print(hah)
     hoh = hah.get('messages')
     if not hoh:
 
@@ -65,15 +49,13 @@ def histori(ChannelID,Echat,TelegMessage):
         telegMessage = open(TelegMessage, "w")
         json.dump(mesaage, telegMessage, indent=2, ensure_ascii='utf-8')
     else:
-
-
         chat = open(Echat, "w")
-        json.dump(request.json(), chat, indent=2, ensure_ascii='utf-8')
+        json.dump(hah, chat, indent=2, ensure_ascii='utf-8')
         #print(hoh)
 
         for i in reversed(hoh):
             text = dict(i)
-
+            print(text)
             nameUser(text)
 
             mesaage = {'teleg': nameUser(text)+' '+text.get('text')}
@@ -87,21 +69,20 @@ def histori(ChannelID,Echat,TelegMessage):
             chat.close()
 
 
-
 def nameUser(jsonResponse):
-        data = dict(jsonResponse)
-        if data.get('user')==None:
-            name = data.get('username')
+        data = jsonResponse
+        print(data)
 
-        else:
-            needItem = data.get('user')
-            fields = {'token': tokenCinemaVR, 'user': needItem}
-            NameInfo = requests.post('https://slack.com/api/users.info', data=fields)
-            needName = dict(NameInfo.json())
-            nameTake = dict(needName.get('user'))
-            #print(nameTake)
-            name = str(nameTake.get('name'))
+        i = data.get('user')
+        print(i)
+
+        needName = dict(Users.Info(tokenCinemaVR,i))
+        nameTake = dict(needName.get('user'))
+        name = nameTake.get('name')
         return name
+
+
+
 
 
 

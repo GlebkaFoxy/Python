@@ -1,3 +1,3 @@
-from tokens import tokenVRTech
+from tokens import tokenVRTech, tokenCinemaVR
 
-fieldChannelsList = {'token': tokenVRTech, 'limit': '0'}
+fieldChannelsList = {'token': tokenCinemaVR, 'limit': '0'}

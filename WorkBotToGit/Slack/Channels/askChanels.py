@@ -15,6 +15,7 @@ def readJson():
         channel = input("Выберите из списка название канала и введите его после двоеточия: ")
         print(channel)
 
+
         for g in data:
             if g.get('name')==channel:
 

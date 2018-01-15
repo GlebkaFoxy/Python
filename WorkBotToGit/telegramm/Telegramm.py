@@ -38,3 +38,7 @@ def sendMessage(TelegMessage,TelegChannel):
 
 
 
+def sendErrorMes(TelegChannel,mess):
+    text = 'Возникла непредвиденная ошибка. Приложение выключается.'+mess
+    rest={'chat_id':TelegChannel,'text':text}
+    error = requests.post(URL+TOKEN+'/sendMessage',data=rest)
